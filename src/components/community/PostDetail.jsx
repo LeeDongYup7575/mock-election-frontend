@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import styled from 'styled-components';
-import { FaPencilAlt, FaTrash, FaArrowUp, FaArrowDown, FaFlag, FaReply, FaPen, FaHome, FaList, FaEye } from 'react-icons/fa';
+import { FaPencilAlt, FaTrash, FaArrowUp, FaArrowDown, FaFlag, FaReply, FaPen, FaHome, FaList, FaEye, FaCommentDots } from 'react-icons/fa';
 import { postAPI } from '../../api/PostApi';
+import { format, parseISO } from 'date-fns';
 
 
 // #region styled-components
@@ -38,7 +39,7 @@ const Meta = styled.div`
   align-items: center;
   color: #888;
   font-size: 14px;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
   padding-bottom: 15px;
   border-bottom: 1px solid #eee;
 `;
@@ -51,7 +52,8 @@ const Info = styled.div`
 
 const Actions = styled.div`
   display: flex;
-  gap: 10px;
+  gap: 15px;
+  padding-right: 5px;
 `;
 
 const ActionButton = styled.button`
@@ -62,7 +64,7 @@ const ActionButton = styled.button`
   font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   &:hover {
     color: #4d82f3;
   }
@@ -74,7 +76,7 @@ const ActionButton = styled.button`
   }
 `;
 
-const ViewCount = styled.div`
+const PostStats = styled.div`
   display: flex;
   align-items: center;
   font-size: 14px;
@@ -86,6 +88,56 @@ const ViewCount = styled.div`
     position: relative;
     top: 1px;
   }
+`;
+
+const AttachmentSection = styled.div`
+  padding-bottom: 10px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+`;
+
+const AttachmentLabel = styled.div`
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.dark};
+  margin-right: 15px;
+  font-size: 13px;
+`
+
+const AttachmentList = styled.ul`
+  color: #444;
+  display: flex;
+  font-size: 12px;
+`;
+
+const AttachmentItem = styled.li`
+  list-style:none;
+  margin-left: 20px;
+
+  &:first-child {
+    margin-left: 3px;
+  }
+`;
+
+const AttachmentLink = styled.a`
+  color: ${({ theme }) => theme.colors.dark};
+  text-decoration: none;
+  max-width: 175px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  vertical-align: bottom;
+
+  &:hover {
+  color: ${({ theme }) => theme.colors.secondary};
+}
+`;
+
+const AttachmentSize = styled.span`
+  color: ${({ theme }) => theme.colors.dark};
+  margin-left: 1px;
+  font-size: 11px;
 `;
 
 const Content = styled.div`
@@ -375,162 +427,213 @@ const GrayBtn = styled(ActionBtn)`
 `;
 // #endregion
 
+// 파일 크기 변환
+const formatFileSize = (bytes) => {
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(1)} KB`;
+  const mb = kb / 1024;
+  return `${mb.toFixed(1)} MB`;
+}
+
+// 날짜 변환
+const formatDate = (isoString) => {
+  return format(parseISO(isoString), 'yyyy.MM.dd HH:mm');
+};
+
 const PostDetail = () => {
-    const navigate = useNavigate();
-    const [comment, setComment] = useState("");
+  const navigate = useNavigate();
+  const [comment, setComment] = useState("");
 
-    const { id } = useParams();
-    const [post, setPost] = useState(null);
+  const { id } = useParams();
+  const [post, setPost] = useState(null);
+  const userId = localStorage.getItem("userId");
+  const isAuthor = post && post.authorId === userId;
 
-    useEffect(() => {
-        const fetchPostDetail = async () => {
-            try {
-                const data = await postAPI.getPostDetail(id);
-                setPost(data);
-            } catch (error) {
-                console.error("게시글 조회 실패:", error);
-            }
-        };
-
-        fetchPostDetail();
-    }, [id]);
-
-    if (!post) return null;
-    return (
-        <Container>
-            <CategoryName>{post.categoryName}</CategoryName>
-            <Title>{post.title}</Title>
-            <Meta>
-                <Info>
-                    <span>{post.authorNickname}</span>
-                    <span>{post.createdAt}</span>
-                    {post.updatedAt && (
-                        <span style={{ fontStyle: 'italic' }}>
-                            수정됨: {post.updatedAt}
-                        </span>
-                    )}
-                </Info>
-                <Actions>
-                    <ActionButton><FaPencilAlt /> 수정</ActionButton>
-                    <ActionButton><FaTrash /> 삭제</ActionButton>
-                    <ViewCount><FaEye />{post.views}</ViewCount>
-                </Actions>
-            </Meta>
-
-            <Content dangerouslySetInnerHTML={{ __html: post.content }} />
-
-            <Footer>
-                <VoteButtons>
-                    <VoteButton type="up"><FaArrowUp /></VoteButton>
-                    <VoteCount>{post.voteCount}</VoteCount>
-                    <VoteButton type="down"><FaArrowDown /></VoteButton>
-                </VoteButtons>
-                <ReportButton><FaFlag /> 신고</ReportButton>
-            </Footer>
-
-            {/*정적으로 만들어놓은 댓글 영역 */}
-            <CommentsSection>
-                <CommentsHeader>
-                    <span>댓글</span>
-                    <span style={{ color: '#888', fontSize: '16px' }}>8개</span>
-                </CommentsHeader>
-
-                <CommentForm>
-                    <TextArea
-                        placeholder="댓글을 입력하세요..."
-                        maxLength={3000}
-                        value={comment}
-                        onChange={e => setComment(e.target.value)}
-                    />
-                    <CharCounter style={{ color: comment.length >= 3000 ? '#ff4d4d' : '#888' }}>{comment.length} / 3000</CharCounter>
-                    <SubmitButton disabled={!comment.trim()}>등록</SubmitButton>
-                    <div style={{ clear: 'both' }}></div>
-                </CommentForm>
-
-                <CommentList>
-                    <Comment>
-                        <CommentHeader>
-                            <div>
-                                <CommentAuthor>박지민</CommentAuthor>
-                                <span>2025.05.06 10:12</span>
-                                <span style={{ marginLeft: 5 }}>수정됨</span>
-                            </div>
-                        </CommentHeader>
-                        <CommentContent>설악산 케이블카 가격이 어떻게 되나요? 주차는 편했나요?</CommentContent>
-                        <CommentActions>
-                            <CommentVoteButtons>
-                                <CommentVoteButton type="up"><FaArrowUp /></CommentVoteButton>
-                                <CommentVoteCount>5</CommentVoteCount>
-                                <CommentVoteButton type="down"><FaArrowDown /></CommentVoteButton>
-                            </CommentVoteButtons>
-                            <span><FaReply /> 답글</span>
-                            <span><FaFlag /> 신고</span>
-                        </CommentActions>
-
-                        <ReplyList>
-                            <Reply>
-                                <CommentHeader>
-                                    <div>
-                                        <CommentAuthor>김선경</CommentAuthor>
-                                        <span>2025.05.06 10:45</span>
-                                    </div>
-                                </CommentHeader>
-                                <CommentContent>
-                                    케이블카는 성인 왕복 25,000원이었어요! 주차는 주말이라 좀 붐볐지만, 오전 일찍 도착해서 큰 문제는 없었습니다. 주차비는 무료였어요.
-                                </CommentContent>
-                                <CommentActions>
-                                    <CommentVoteButtons>
-                                        <CommentVoteButton type="up"><FaArrowUp /></CommentVoteButton>
-                                        <CommentVoteCount>3</CommentVoteCount>
-                                        <CommentVoteButton type="down"><FaArrowDown /></CommentVoteButton>
-                                    </CommentVoteButtons>
-                                    <span><FaReply /> 답글</span>
-                                    <span><FaFlag /> 신고</span>
-                                </CommentActions>
-                                <ReplyForm>
-                                    <ReplyTextarea placeholder="답글을 입력하세요..." maxLength={3000} />
-                                    <ReplyCharCounter>0 / 3000</ReplyCharCounter>
-                                    <ReplyButton>등록</ReplyButton>
-                                    <div style={{ clear: 'both' }}></div>
-                                </ReplyForm>
-                            </Reply>
-                        </ReplyList>
-                    </Comment>
-
-                    <Comment>
-                        <CommentHeader>
-                            <div>
-                                <CommentAuthor>이수진</CommentAuthor>
-                                <span>2025.05.06 12:33</span>
-                            </div>
-                        </CommentHeader>
-                        <CommentContent>바다뷰 펜션 가격대가 어떻게 되나요? 4인 가족 기준으로 알려주시면 감사하겠습니다.</CommentContent>
-                        <CommentActions>
-                            <CommentVoteButtons>
-                                <CommentVoteButton type="up"><FaArrowUp /></CommentVoteButton>
-                                <CommentVoteCount>2</CommentVoteCount>
-                                <CommentVoteButton type="down"><FaArrowDown /></CommentVoteButton>
-                            </CommentVoteButtons>
-                            <span><FaReply /> 답글</span>
-                            <span><FaFlag /> 신고</span>
-                        </CommentActions>
-                    </Comment>
-                </CommentList>
-            </CommentsSection>
+  // 게시글 삭제 핸들러
+  const handleDelete = async () => {
+    if (!window.confirm("게시글을 삭제하시겠습니까?")) return;
+  
+    try {
+      await postAPI.delete(id);
+      navigate("/community");
+    } catch (error) {
+      console.error("게시글 삭제 실패:", error);
+      alert("삭제에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
 
 
-            <PostActionsBar>
-                <LeftActions>
-                    <WriteBtn onClick={() => navigate("/community/board/write")}><FaPen /> 글쓰기</WriteBtn>
-                </LeftActions>
-                <RightActions>
-                    <GrayBtn onClick={() => navigate("/community")}><FaHome /> 커뮤니티 메인</GrayBtn>
-                    <GrayBtn><FaList /> 목록</GrayBtn>
-                    <GrayBtn><FaArrowUp /> TOP</GrayBtn>
-                </RightActions>
-            </PostActionsBar>
-        </Container>
-    );
+  useEffect(() => {
+    const fetchPostDetail = async () => {
+      try {
+        const data = await postAPI.getPostDetail(id);
+        setPost(data);
+      } catch (error) {
+        console.error("게시글 조회 실패:", error);
+      }
+    };
+
+    fetchPostDetail();
+  }, [id]);
+
+  if (!post) return null;
+  return (
+    <Container>
+      <CategoryName>{post.categoryName}</CategoryName>
+      <Title>{post.title}</Title>
+      <Meta>
+        <Info>
+          <span>{post.authorNickname}</span>
+          <span>{formatDate(post.createdAt)}</span>
+          {post.updatedAt && (
+            <span style={{ fontStyle: 'italic' }}>
+              수정됨: {formatDate(post.updatedAt)}
+            </span>
+          )}
+        </Info>
+        <Actions>
+          {isAuthor && (
+            <>
+            <ActionButton><FaPencilAlt /> 수정</ActionButton>
+            <ActionButton onClick={handleDelete}><FaTrash /> 삭제</ActionButton>
+            </>
+          )}
+          <PostStats><FaEye />{post.views} </PostStats>
+          <PostStats><FaCommentDots /> {post.commentCount}</PostStats>
+        </Actions>
+      </Meta>
+
+      {post.attachments && post.attachments.length > 0 && (
+        <AttachmentSection>
+          <AttachmentLabel>첨부파일</AttachmentLabel>
+          <AttachmentList>
+            {post.attachments.map((file, idx) => (
+              <AttachmentItem key={idx}>
+                <AttachmentLink href={file.url} download target="_blank" rel="noopener noreferrer" title={file.name}>
+                  · {file.name}
+                </AttachmentLink>
+                <AttachmentSize>({formatFileSize(file.size)})</AttachmentSize>
+              </AttachmentItem>
+            ))}
+          </AttachmentList>
+        </AttachmentSection>
+      )}
+
+      <Content dangerouslySetInnerHTML={{ __html: post.content }} />
+
+      <Footer>
+        <VoteButtons>
+          <VoteButton type="up"><FaArrowUp /></VoteButton>
+          <VoteCount>{post.voteCount}</VoteCount>
+          <VoteButton type="down"><FaArrowDown /></VoteButton>
+        </VoteButtons>
+        <ReportButton><FaFlag /> 신고</ReportButton>
+      </Footer>
+
+      {/*정적으로 만들어놓은 댓글 영역 */}
+      <CommentsSection>
+        <CommentsHeader>
+          <span>댓글</span>
+          <span style={{ color: '#888', fontSize: '16px' }}>8개</span>
+        </CommentsHeader>
+
+        <CommentForm>
+          <TextArea
+            placeholder="댓글을 입력하세요..."
+            maxLength={3000}
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+          />
+          <CharCounter style={{ color: comment.length >= 3000 ? '#ff4d4d' : '#888' }}>{comment.length} / 3000</CharCounter>
+          <SubmitButton disabled={!comment.trim()}>등록</SubmitButton>
+          <div style={{ clear: 'both' }}></div>
+        </CommentForm>
+
+        <CommentList>
+          <Comment>
+            <CommentHeader>
+              <div>
+                <CommentAuthor>박지민</CommentAuthor>
+                <span>2025.05.06 10:12</span>
+                <span style={{ marginLeft: 5 }}>수정됨</span>
+              </div>
+            </CommentHeader>
+            <CommentContent>설악산 케이블카 가격이 어떻게 되나요? 주차는 편했나요?</CommentContent>
+            <CommentActions>
+              <CommentVoteButtons>
+                <CommentVoteButton type="up"><FaArrowUp /></CommentVoteButton>
+                <CommentVoteCount>5</CommentVoteCount>
+                <CommentVoteButton type="down"><FaArrowDown /></CommentVoteButton>
+              </CommentVoteButtons>
+              <span><FaReply /> 답글</span>
+              <span><FaFlag /> 신고</span>
+            </CommentActions>
+
+            <ReplyList>
+              <Reply>
+                <CommentHeader>
+                  <div>
+                    <CommentAuthor>김선경</CommentAuthor>
+                    <span>2025.05.06 10:45</span>
+                  </div>
+                </CommentHeader>
+                <CommentContent>
+                  케이블카는 성인 왕복 25,000원이었어요! 주차는 주말이라 좀 붐볐지만, 오전 일찍 도착해서 큰 문제는 없었습니다. 주차비는 무료였어요.
+                </CommentContent>
+                <CommentActions>
+                  <CommentVoteButtons>
+                    <CommentVoteButton type="up"><FaArrowUp /></CommentVoteButton>
+                    <CommentVoteCount>3</CommentVoteCount>
+                    <CommentVoteButton type="down"><FaArrowDown /></CommentVoteButton>
+                  </CommentVoteButtons>
+                  <span><FaReply /> 답글</span>
+                  <span><FaFlag /> 신고</span>
+                </CommentActions>
+                <ReplyForm>
+                  <ReplyTextarea placeholder="답글을 입력하세요..." maxLength={3000} />
+                  <ReplyCharCounter>0 / 3000</ReplyCharCounter>
+                  <ReplyButton>등록</ReplyButton>
+                  <div style={{ clear: 'both' }}></div>
+                </ReplyForm>
+              </Reply>
+            </ReplyList>
+          </Comment>
+
+          <Comment>
+            <CommentHeader>
+              <div>
+                <CommentAuthor>이수진</CommentAuthor>
+                <span>2025.05.06 12:33</span>
+              </div>
+            </CommentHeader>
+            <CommentContent>바다뷰 펜션 가격대가 어떻게 되나요? 4인 가족 기준으로 알려주시면 감사하겠습니다.</CommentContent>
+            <CommentActions>
+              <CommentVoteButtons>
+                <CommentVoteButton type="up"><FaArrowUp /></CommentVoteButton>
+                <CommentVoteCount>2</CommentVoteCount>
+                <CommentVoteButton type="down"><FaArrowDown /></CommentVoteButton>
+              </CommentVoteButtons>
+              <span><FaReply /> 답글</span>
+              <span><FaFlag /> 신고</span>
+            </CommentActions>
+          </Comment>
+        </CommentList>
+      </CommentsSection>
+
+
+      <PostActionsBar>
+        <LeftActions>
+          <WriteBtn onClick={() => navigate("/community/board/write")}><FaPen /> 글쓰기</WriteBtn>
+        </LeftActions>
+        <RightActions>
+          <GrayBtn onClick={() => navigate("/community")}><FaHome /> 커뮤니티 메인</GrayBtn>
+          <GrayBtn><FaList /> 목록</GrayBtn>
+          <GrayBtn><FaArrowUp /> TOP</GrayBtn>
+        </RightActions>
+      </PostActionsBar>
+    </Container>
+  );
 };
 
 export default PostDetail;
