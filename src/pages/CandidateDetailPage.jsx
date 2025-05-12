@@ -24,11 +24,11 @@ const Search = styled.input`
     border: 1px solid #ccc;
     font-size: 16px;
     outline: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
     &:focus {
         border-color: #adb5bd;
-        box-shadow: 0 0 0 2px rgba(173,181,189,0.4);
+        box-shadow: 0 0 0 2px rgba(173, 181, 189, 0.4);
     }
 `;
 
@@ -74,15 +74,27 @@ const CandidateDetailPage = () => {
     const [policies, setPolicies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
-    const [focuse,setFocuse] = useState(null);
 
     const handleSearch = () => {
-        
+        console.log(searchTerm);
     }
 
+    const highlightText = (text, keyword) => {
+        if (!keyword.trim()) return text;
+
+        const regex = new RegExp(`(${keyword})`, 'gi');
+        const parts = text.split(regex);
+
+        return parts.map((part, index) =>
+            part.toLowerCase() === keyword.toLowerCase() ? (
+                <mark key={index} style={{ backgroundColor: '#ffea00' }}>{part}</mark>
+            ) : (
+                <span key={index}>{part}</span>
+            )
+        );
+    };
+
     useEffect(() => {
-        console.log(partyName);
-        console.log(sgId);
         if (!sgId || !partyName) return;
 
         candidateAPI.getCandidateDetail(sgId, partyName)
@@ -99,16 +111,16 @@ const CandidateDetailPage = () => {
             <Title>정책 상세 정보 - ({partyName})</Title>
 
             <SearchContainer>
-                <Search placeholder="공약 키워드를 입력하세요" onChange={(e)=>setSearchTerm(e.target.value)} />
+                <Search placeholder="공약 키워드를 입력하세요" onChange={(e) => setSearchTerm(e.target.value)}/>
                 <SearchBtn onClick={handleSearch}>검색</SearchBtn>
             </SearchContainer>
 
             <PolicyListContainer>
                 {policies.map((policy) => (
                     <PolicyCard key={policy.id}>
-                        <PolicyTitle>{policy.title}</PolicyTitle>
+                        <PolicyTitle>{highlightText(policy.title, searchTerm)}</PolicyTitle>
                         {policy.content.split('\n').map((line, idx) => (
-                            <p key={idx}>{line}</p>
+                            <p key={idx}>{highlightText(line, searchTerm)}</p>
                         ))}
                     </PolicyCard>
                 ))}
