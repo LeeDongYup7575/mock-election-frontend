@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-    baseURL: process.env.REACT_ELECTION_API_URL || 'http://localhost/api/election',
+    baseURL: process.env.REACT_APP_ELECTION_API_URL || 'http://localhost/api/election',
     headers: {
         'Content-Type': 'application/json',
     },

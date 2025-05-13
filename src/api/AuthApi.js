@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API 인스턴스 생성
 const api = axios.create({
-    baseURL: process.env.REACT_USER_API_URL || 'http://localhost/api/users',
+    baseURL: process.env.REACT_APP_USER_API_URL || 'http://localhost/api/users',
     headers: {
         'Content-Type': 'application/json',
     },

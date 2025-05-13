@@ -5,7 +5,7 @@ import axios from 'axios';
 
 // Axios 인스턴스 생성
 const api = axios.create({
-    baseURL: process.env.REACT_QUIZ_API_URL || 'http://localhost/api/quiz',
+    baseURL: process.env.REACT_APP_QUIZ_API_URL || 'http://localhost/api/quiz',
     headers: {
         'Content-Type': 'application/json',
     },
