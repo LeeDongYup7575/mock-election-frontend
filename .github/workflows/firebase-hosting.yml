@@ -17,9 +17,27 @@ jobs:
         with:
           node-version: 20
 
-      - run: npm ci
-      - run: npm run build
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build React App
+        run: npm run build
         env:
+          REACT_APP_GOOGLE_CLIENT_ID: ${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }}
+          REACT_USER_API_URL: ${{ secrets.REACT_USER_API_URL }}
+          REACT_CANDIDATE_API_URL: ${{ secrets.REACT_CANDIDATE_API_URL }}
+          REACT_ELECTION_API_URL: ${{ secrets.REACT_ELECTION_API_URL }}
+          REACT_YOUTUBE_API_URL: ${{ secrets.REACT_YOUTUBE_API_URL }}
+          REACT_QUIZ_API_URL: ${{ secrets.REACT_QUIZ_API_URL }}
+          REACT_COMMUNITY_API_URL: ${{ secrets.REACT_COMMUNITY_API_URL }}
+          REACT_COMMUNITY_CATEGORY_API_URL: ${{ secrets.REACT_COMMUNITY_CATEGORY_API_URL }}
+          REACT_COMMUNITY_POST_API_URL: ${{ secrets.REACT_COMMUNITY_POST_API_URL }}
+          REACT_FILE_API_URL: ${{ secrets.REACT_FILE_API_URL }}
+          REACT_APP_MAX_FILE_SIZE_MB: ${{ secrets.REACT_APP_MAX_FILE_SIZE_MB }}
+          REACT_WALLET_API_URL: ${{ secrets.REACT_WALLET_API_URL }}
+          REACT_GLOSSARY_API_URL: ${{ secrets.REACT_GLOSSARY_API_URL }}
+          REACT_TRANSLATION_API_URL: ${{ secrets.REACT_TRANSLATION_API_URL }}
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
           CI: false
 
       - name: Deploy to Firebase
@@ -29,4 +47,3 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
           channelId: live
           projectId: mock-election-frontend
-
