@@ -45,6 +45,7 @@ jobs:
           REACT_BLOCKCHAIN_API_URL: ${{ secrets.REACT_BLOCKCHAIN_API_URL }}
           CI: false
 
+
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
