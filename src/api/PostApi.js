@@ -44,6 +44,7 @@ export const postAPI = {
                 size
             }
         });
+        console.log(response.data.data);
         return response.data.data;
     },
 
