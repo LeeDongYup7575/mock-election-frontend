@@ -44,6 +44,7 @@ jobs:
           REACT_APP_BLOCKCHAIN_CHAIN_ID: ${{ secrets.REACT_APP_BLOCKCHAIN_CHAIN_ID }}
           REACT_BLOCKCHAIN_API_URL: ${{ secrets.REACT_BLOCKCHAIN_API_URL }}
           REACT_APP_ADMIN_API_URL: ${{ secrets.REACT_ADMIN_API_URL }}
+          REACT_APP_VOTING_API_URL: ${{ secrets.REACT_APP_VOTING_API_URL }}
           CI: false
 
 
