@@ -49,6 +49,7 @@ jobs:
           REACT_APP_NEWS_API_URL: ${{ secrets.REACT_APP_NEWS_API_URL }}
           REACT_APP_REPORT_API_URL: ${{ secrets.REACT_APP_REPORT_API_URL }}
           REACT_APP_POLLING_API_URL: ${{ secrets.REACT_APP_POLLING_API_URL }}
+          REACT_APP_SPAM_CHECK_API_URL: ${{ secrets.REACT_APP_SPAM_CHECK_API_URL }}
           CI: false
 
 
