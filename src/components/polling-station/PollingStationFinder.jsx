@@ -177,6 +177,7 @@ const PollingStationFinder = () => {
             throw new Error('행정구역 정보를 찾을 수 없습니다.');
         } catch (error) {
             console.error('역지오코딩 API 호출 실패:', error);
+
             throw error;
         }
     };
