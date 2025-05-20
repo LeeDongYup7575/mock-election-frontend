@@ -358,7 +358,7 @@ const PollingStationFinder = () => {
                 numOfRows : 3, // 한 번에 가져올 데이터 수
                 pageNo : 1
             });
-            console.log("🔍 응답 구조 확인:", data);
+            console.log("🔍 응답 구조 확인:", response.data);
             console.log("API 응답:", response);
 
             // XML 응답 또는 JSON 응답 처리
