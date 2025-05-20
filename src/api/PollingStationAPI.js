@@ -75,7 +75,7 @@ const pollingStationAPI = {
     // 사전투표소 정보 조회
     getPrePollingStations: async (params) => {
         console.log("사전투표소 API 호출 시도:", params);
-        const response = await axios.get(`/getPrePolplcOtlnmapTrnsportInfoInqire`, {
+        const response = await api.get(`/getPrePolplcOtlnmapTrnsportInfoInqire`, {
             params: {
                 ...params,
                 resultType: params.resultType || 'json'
@@ -88,7 +88,7 @@ const pollingStationAPI = {
     // 선거일투표소 정보 조회
     getPollingStations: async (params) => {
         console.log("선거일투표소 API 호출 시도:", params);
-        const response = await axios.get(`/getPolplcOtlnmapTrnsportInfoInqire`, {
+        const response = await api.get(`/getPolplcOtlnmapTrnsportInfoInqire`, {
             params: {
                 ...params,
                 resultType: params.resultType || 'json'
