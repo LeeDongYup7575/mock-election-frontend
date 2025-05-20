@@ -1,7 +1,7 @@
 {
   "name": "mock-voting-front",
   "version": "0.1.0",
-  "proxy": "http://localhost",
+  "proxy": "https://mock-election-frontend.web.app",
   "private": true,
   "dependencies": {
     "@stomp/stompjs": "^7.1.1",
