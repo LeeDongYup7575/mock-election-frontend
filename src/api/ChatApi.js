@@ -5,7 +5,7 @@ import {Client} from '@stomp/stompjs';
 // API 인스턴스 생성
 const api = axios.create({
     baseURL: process.env.REACT_APP_CHAT_API_URL || 'http://localhost/api/chat',
-    header : {
+    headers : {
         'Content-Type' : 'application/json',
     },
     withCredentials : true // CORS 요청 시 자격 증명 정보 포함
