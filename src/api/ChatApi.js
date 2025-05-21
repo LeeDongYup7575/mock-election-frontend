@@ -5,7 +5,7 @@ import {Client} from '@stomp/stompjs';
 // API 인스턴스 생성
 const api = axios.create({
     baseURL: process.env.REACT_APP_CHAT_API_URL || 'http://localhost/api/chat',
-    headers : {
+    header : {
         'Content-Type' : 'application/json',
     },
     withCredentials : true // CORS 요청 시 자격 증명 정보 포함
@@ -46,7 +46,7 @@ api.interceptors.response.use(
 const createStompClient = () => {
     const token = localStorage.getItem('token');
 
-    const socket = new SockJS('https://mock-387948012196.asia-northeast3.run.app/wss', null, {
+    const socket = new SockJS('http://localhost/ws', null, {
         transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
         withCredentials: false
     });
@@ -133,15 +133,15 @@ export const chatAPI = {
 
     // 참여자 목록 가져오기
     getRoomParticipants : async (chatroomId) => {
-           try {
-                // const response = await api.get(`/participants/${chatroomId}`);
-               const response = await api.get(`/participants/${chatroomId}`);
-               console.log('참여자 목록 응답:', response.data); // 응답 데이터 로깅 추가
-                return response.data;
-           } catch (error){
-                console.log('참여자 목록 조회 오류 : ', error);
-                throw error;
-           }
+        try {
+            // const response = await api.get(`/participants/${chatroomId}`);
+            const response = await api.get(`/participants/${chatroomId}`);
+            console.log('참여자 목록 응답:', response.data); // 응답 데이터 로깅 추가
+            return response.data;
+        } catch (error){
+            console.log('참여자 목록 조회 오류 : ', error);
+            throw error;
+        }
     },
     // 참여자 목록 구독 (WebSocket)
     subscribeToParticipants : (stompClient, chatroomId, callback) => {
