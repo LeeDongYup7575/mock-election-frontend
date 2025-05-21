@@ -427,7 +427,7 @@ const PollingStationFinder = () => {
 
         } catch (error) {
             console.error("투표소 정보를 가져오는데 실패했습니다:", error);
-            setError(`투표소 정보를 가져오는데 실패했습니다: ${error.message}`);
+            setError(`투표소 정보를 가져오는데 실패했습니다`);
 
             // 오류 발생 시 빈 배열로 초기화
             setAllStations([]);
