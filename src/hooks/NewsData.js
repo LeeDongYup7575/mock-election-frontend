@@ -46,7 +46,6 @@ export const useNewsData = () => {
                 //     }
                 // ];
 
-                console.log(response.data);
                 setMainNews(response.data[0]);
                 setSideNews(response.data.slice(1,4));
                 setIsLoading(false);

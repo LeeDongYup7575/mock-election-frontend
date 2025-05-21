@@ -104,7 +104,6 @@ const CandidateDetailPage = () => {
     const [openIndex, setOpenIndex] = useState(null);
 
     const handleSearch = () => {
-        console.log("검색어:", searchTerm);
     };
 
     const toggleAccordion = (index) => {
