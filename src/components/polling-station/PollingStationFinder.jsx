@@ -360,7 +360,7 @@ const PollingStationFinder = () => {
                 pageNo : 1
             });
             console.log("🔍 응답 구조 확인:", response.data);
-            console.log("API 응답:", response);
+            console.log("API 응답:", response.data);
 
             // XML 응답 또는 JSON 응답 처리
             let stationItems = [];
