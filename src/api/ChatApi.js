@@ -46,7 +46,7 @@ api.interceptors.response.use(
 const createStompClient = () => {
     const token = localStorage.getItem('token');
 
-    const socket = new SockJS('http://localhost/ws', null, {
+    const socket = new SockJS('https://mock-387948012196.asia-northeast3.run.app/wss', null, {
         transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
         withCredentials: false
     });
